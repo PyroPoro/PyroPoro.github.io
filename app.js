@@ -167,29 +167,36 @@ function setupSVG(cond) {
   const mount = document.getElementById("svgMount");
   mount.innerHTML = "";
 
-  // Always show the system cursor now
+  // Create the SVG
   svg = d3.select("#svgMount").append("svg")
       .attr("width", W)
-      .attr("height", H)
-      .style("cursor", "default");
+      .attr("height", H);
 
+  // Background rect - ensure it doesn't have a 'none' cursor
   svg.append("rect")
       .attr("width", W)
       .attr("height", H)
-      .attr("fill", "#fafafa");
+      .attr("fill", "#fafafa")
+      .style("cursor", "default");
 
-  // Range indicator circle
-  svg.append("circle").attr("class", "cursorVis")
-      .attr("fill", "rgba(128, 128, 128, 0.15)") // Slightly lighter to see pointer better
+  // Range indicator circle (The gray circle)
+  // IMPORTANT: pointer-events is 'none' so it doesn't steal the mouse focus
+  svg.append("circle")
+      .attr("class", "cursorVis")
+      .attr("fill", "rgba(128, 128, 128, 0.15)")
       .attr("stroke", "#999")
+      .attr("stroke-width", 1)
       .attr("pointer-events", "none");
 
+  // Attach listeners to the SVG itself
   svg.on("mousemove", function() {
     const mouse = d3.mouse(this);
     const captured = getCapture(mouse, cond.cursor);
     updateFill(captured);
   }).on("click", function() {
-    handleClick(getCapture(d3.mouse(this), cond.cursor));
+    const mouse = d3.mouse(this);
+    const captured = getCapture(mouse, cond.cursor);
+    handleClick(captured);
   });
 }
 
