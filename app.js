@@ -170,36 +170,32 @@ function setupSVG(cond) {
   const mount = document.getElementById("svgMount");
   mount.innerHTML = "";
 
-  // Create the SVG and force the default cursor
+  // Force 'default' cursor on the SVG container
   svg = d3.select("#svgMount").append("svg")
       .attr("width", W)
       .attr("height", H)
-      .style("cursor", "default"); // Force system pointer
+      .style("cursor", "default");
 
-  // Background rect to capture events
+  // Ensure the background rectangle also forces the default cursor
   svg.append("rect")
       .attr("width", W)
       .attr("height", H)
       .attr("fill", "#fafafa")
       .style("cursor", "default");
 
-  // Range indicator circle (The gray circle)
-  // pointer-events: none is CRITICAL so it doesn't hide the cursor or block clicks
+  // Range indicator circle
   svg.append("circle")
       .attr("class", "cursorVis")
       .attr("fill", "rgba(128, 128, 128, 0.15)")
       .attr("stroke", "#999")
-      .attr("stroke-width", 1)
-      .attr("pointer-events", "none");
+      .attr("pointer-events", "none"); // Crucial: cursor "shines through" this element
 
   svg.on("mousemove", function() {
     const mouse = d3.mouse(this);
     const captured = getCapture(mouse, cond.cursor);
     updateFill(captured);
   }).on("click", function() {
-    const mouse = d3.mouse(this);
-    const captured = getCapture(mouse, cond.cursor);
-    handleClick(captured);
+    handleClick(getCapture(d3.mouse(this), cond.cursor));
   });
 }
 
