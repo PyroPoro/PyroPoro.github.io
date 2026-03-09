@@ -113,8 +113,12 @@ function handleClick(capturedIdx) {
 // ─── CURSOR CALCULATIONS ─────────────────────────────────────────────────────
 function getCapture(mouse, type) {
   const m = [mouse[0], mouse[1]];
+  const cursorElement = svg.select(".cursorVis");
 
   if (type === "POINT") {
+    // Hide the custom visual circle entirely so only system cursor shows
+    cursorElement.attr("r", 0);
+
     for (let i = 0; i < targets.length; i++) {
       if (dist(m, targets[i].pos) <= targets[i].r) return i;
     }
@@ -127,7 +131,8 @@ function getCapture(mouse, type) {
     const contain = targets.map((t, i) => d_i[i] + t.r);
 
     let nearest = 0;
-    for (let i = 1; i < targets.length; i++) if (interact[i] < interact[nearest]) nearest = i;
+    for (let i = 1; i < targets.length; i++)
+      if (interact[i] < interact[nearest]) nearest = i;
 
     let second = (nearest === 0 ? 1 : 0);
     for (let i = 0; i < targets.length; i++) {
@@ -135,18 +140,29 @@ function getCapture(mouse, type) {
     }
 
     const bubbleR = Math.min(contain[nearest], interact[second]);
-    svg.select(".cursorVis").attr("cx", m[0]).attr("cy", m[1]).attr("r", bubbleR);
+
+    cursorElement
+        .attr("cx", m[0])
+        .attr("cy", m[1])
+        .attr("r", bubbleR);
+
     return nearest;
   }
 
   if (type === "AREA") {
-    svg.select(".cursorVis").attr("cx", m[0]).attr("cy", m[1]).attr("r", AREA_CURSOR_RADIUS);
-    let insideIdx = -1, overlapCount = 0, lastOverlap = -1;
+    cursorElement
+        .attr("cx", m[0])
+        .attr("cy", m[1])
+        .attr("r", AREA_CURSOR_RADIUS);
 
+    let insideIdx = -1, overlapCount = 0, lastOverlap = -1;
     for (let i = 0; i < targets.length; i++) {
       const d = dist(m, targets[i].pos);
       if (d <= targets[i].r) insideIdx = i;
-      if (d <= targets[i].r + AREA_CURSOR_RADIUS) { overlapCount++; lastOverlap = i; }
+      if (d <= targets[i].r + AREA_CURSOR_RADIUS) {
+        overlapCount++;
+        lastOverlap = i;
+      }
     }
     return insideIdx !== -1 ? insideIdx : (overlapCount === 1 ? lastOverlap : -1);
   }
@@ -156,17 +172,31 @@ function getCapture(mouse, type) {
 function setupSVG(cond) {
   const mount = document.getElementById("svgMount");
   mount.innerHTML = "";
-  svg = d3.select("#svgMount").append("svg").attr("width", W).attr("height", H).style("cursor", "none");
 
-  svg.append("rect").attr("width", W).attr("height", H).attr("fill", "#fafafa");
+  // Toggle the system cursor:
+  // If it's POINT, use 'default'. Otherwise, hide it ('none').
+  const cursorStyle = (cond.cursor === "POINT") ? "default" : "none";
 
-  // The range indicator circle (Bubble/Area)
+  svg = d3.select("#svgMount").append("svg")
+      .attr("width", W)
+      .attr("height", H)
+      .style("cursor", cursorStyle);
+
+  svg.append("rect")
+      .attr("width", W)
+      .attr("height", H)
+      .attr("fill", "#fafafa");
+
+  // The range indicator circle (only visible for BUBBLE and AREA)
   svg.append("circle").attr("class", "cursorVis")
-      .attr("fill", "rgba(128, 128, 128, 0.2)").attr("stroke", "#999").attr("pointer-events", "none");
+      .attr("fill", "rgba(128, 128, 128, 0.2)")
+      .attr("stroke", "#999")
+      .attr("pointer-events", "none");
 
   svg.on("mousemove", function() {
     const mouse = d3.mouse(this);
-    updateFill(getCapture(mouse, cond.cursor));
+    const captured = getCapture(mouse, cond.cursor);
+    updateFill(captured);
   }).on("click", function() {
     handleClick(getCapture(d3.mouse(this), cond.cursor));
   });
