@@ -51,14 +51,15 @@
     <h2 id="instrParticipant"></h2>
     <div class="stats-box">
         <h3>Condition <span id="condNum"></span> of 27</h3>
+        <p style="font-size: 1.2em; color: #2563eb;"><strong>Current Progress: Block <span id="instrBlockNum"></span> of 3</strong></p>
+        <hr>
         <p><strong>Cursor:</strong> <span id="instrCursor"></span></p>
         <p><strong>Target Size:</strong> <span id="instrSize"></span></p>
         <p><strong>Separation:</strong> <span id="instrSep"></span></p>
     </div>
     <p id="instrDesc"></p>
-    <p>You will perform <strong>3 blocks</strong> for this condition, with <strong>5 trials</strong> each.</p>
     <div class="progress-bar"><div id="overallProgress"></div></div>
-    <button class="btn-primary" id="startBlockBtn" onclick="startBlock()">Start Block <span id="instrBlockNum">1</span></button>
+    <button class="btn-primary" id="startBlockBtn" onclick="startBlock()">Start Block</button>
 </div>
 
 <div id="experimentScreen" class="screen">
@@ -72,13 +73,13 @@
 </div>
 
 <div id="breakScreen" class="screen">
-    <h2 id="breakHeader">Block Complete</h2>
+    <h2 id="breakHeader">Block Complete!</h2>
     <div class="stats-box">
-        <p><strong>Progress:</strong> <span id="breakBlockStatus"></span></p>
+        <p>Great job. Review your stats for the block below:</p>
         <p><strong>Accuracy:</strong> <span id="breakAccuracy"></span></p>
         <p><strong>Avg Time:</strong> <span id="breakAvgTime"></span></p>
     </div>
-    <button class="btn-primary" id="breakBtn" onclick="onBreakContinue()">Next</button>
+    <button class="btn-primary" id="breakBtn" onclick="onBreakContinue()">Continue</button>
 </div>
 
 <div id="completeScreen" class="screen">

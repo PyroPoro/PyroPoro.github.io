@@ -56,7 +56,10 @@ function showInstructionScreen() {
   const cond = conditions[condIdx];
   document.getElementById("instrParticipant").textContent = `Participant: ${participant}`;
   document.getElementById("condNum").textContent = condIdx + 1;
+
+  // Updated Block Counter Logic
   document.getElementById("instrBlockNum").textContent = blockIdx + 1;
+
   document.getElementById("instrCursor").textContent = cond.cursor;
   document.getElementById("instrSize").textContent = cond.size.label;
   document.getElementById("instrSep").textContent = cond.sep.label;
@@ -224,20 +227,17 @@ function finishBlock() {
 
   conditionData.push({ trials: blockTrials, accuracy: acc, avgTime: avgTime });
 
-  // Update the break screen details
   document.getElementById("breakAccuracy").textContent = acc + "%";
   document.getElementById("breakAvgTime").textContent = avgTime + " ms";
 
-  // Update the block counter (e.g., "Block 1 of 3")
-  document.getElementById("breakBlockStatus").textContent = `Block ${blockIdx + 1} of ${BLOCKS_PER_CONDITION}`;
+  blockIdx++; // Move to next block state
 
-  blockIdx++;
   if (blockIdx >= BLOCKS_PER_CONDITION) {
     document.getElementById("breakHeader").textContent = "Condition Complete!";
     document.getElementById("breakBtn").textContent = "Next Condition →";
   } else {
     document.getElementById("breakHeader").textContent = "Block Complete";
-    document.getElementById("breakBtn").textContent = "Next Block →";
+    document.getElementById("breakBtn").textContent = "Continue to Next Block →";
   }
   showScreen("breakScreen");
 }
