@@ -60,7 +60,7 @@ function showInstructionScreen() {
   document.getElementById("instrCursor").textContent = cond.cursor;
   document.getElementById("instrSize").textContent = cond.size.label;
   document.getElementById("instrSep").textContent = cond.sep.label;
-  document.getElementById("instrDesc").innerHTML = CURSOR_DESCRIPTIONS[cond.cursor];
+  document.getElementById("instrDesc").innerHTML = "Cursor Description: " + CURSOR_DESCRIPTIONS[cond.cursor];
 
   const progress = (condIdx / 27) * 100;
   document.getElementById("overallProgress").style.width = progress + "%";
