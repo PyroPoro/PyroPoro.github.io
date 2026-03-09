@@ -167,12 +167,13 @@ function setupSVG(cond) {
   const mount = document.getElementById("svgMount");
   mount.innerHTML = "";
 
-  // Create the SVG
+  // Create the SVG and force the default cursor
   svg = d3.select("#svgMount").append("svg")
       .attr("width", W)
-      .attr("height", H);
+      .attr("height", H)
+      .style("cursor", "default"); // Force system pointer
 
-  // Background rect - ensure it doesn't have a 'none' cursor
+  // Background rect to capture events
   svg.append("rect")
       .attr("width", W)
       .attr("height", H)
@@ -180,7 +181,7 @@ function setupSVG(cond) {
       .style("cursor", "default");
 
   // Range indicator circle (The gray circle)
-  // IMPORTANT: pointer-events is 'none' so it doesn't steal the mouse focus
+  // pointer-events: none is CRITICAL so it doesn't hide the cursor or block clicks
   svg.append("circle")
       .attr("class", "cursorVis")
       .attr("fill", "rgba(128, 128, 128, 0.15)")
@@ -188,7 +189,6 @@ function setupSVG(cond) {
       .attr("stroke-width", 1)
       .attr("pointer-events", "none");
 
-  // Attach listeners to the SVG itself
   svg.on("mousemove", function() {
     const mouse = d3.mouse(this);
     const captured = getCapture(mouse, cond.cursor);
@@ -224,13 +224,19 @@ function finishBlock() {
 
   conditionData.push({ trials: blockTrials, accuracy: acc, avgTime: avgTime });
 
+  // Update the break screen details
   document.getElementById("breakAccuracy").textContent = acc + "%";
   document.getElementById("breakAvgTime").textContent = avgTime + " ms";
 
+  // Update the block counter (e.g., "Block 1 of 3")
+  document.getElementById("breakBlockStatus").textContent = `Block ${blockIdx + 1} of ${BLOCKS_PER_CONDITION}`;
+
   blockIdx++;
   if (blockIdx >= BLOCKS_PER_CONDITION) {
+    document.getElementById("breakHeader").textContent = "Condition Complete!";
     document.getElementById("breakBtn").textContent = "Next Condition →";
   } else {
+    document.getElementById("breakHeader").textContent = "Block Complete";
     document.getElementById("breakBtn").textContent = "Next Block →";
   }
   showScreen("breakScreen");
