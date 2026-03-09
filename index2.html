@@ -18,6 +18,17 @@
         #toast.show { opacity: 1; }
         .progress-bar { height: 10px; background: #e2e8f0; border-radius: 5px; margin-top: 10px; }
         #overallProgress { height: 100%; background: #10b981; width: 0%; border-radius: 5px; transition: width 0.3s; }
+        #trialCounter {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.6); /* Slightly more transparent */
+            padding: 5px 10px;
+            border-radius: 4px;
+            pointer-events: none; /* Allows clicks to pass through to targets below */
+            z-index: 10;
+        }
     </style>
 </head>
 <body>

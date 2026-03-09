@@ -115,10 +115,11 @@ function getCapture(mouse, type) {
   const m = [mouse[0], mouse[1]];
   const cursorElement = svg.select(".cursorVis");
 
-  if (type === "POINT") {
-    // Hide the custom visual circle entirely so only system cursor shows
-    cursorElement.attr("r", 0);
+  // Shared behavior: move the visual aid to the mouse position
+  cursorElement.attr("cx", m[0]).attr("cy", m[1]);
 
+  if (type === "POINT") {
+    cursorElement.attr("r", 0); // No circle for Point
     for (let i = 0; i < targets.length; i++) {
       if (dist(m, targets[i].pos) <= targets[i].r) return i;
     }
@@ -140,20 +141,13 @@ function getCapture(mouse, type) {
     }
 
     const bubbleR = Math.min(contain[nearest], interact[second]);
-
-    cursorElement
-        .attr("cx", m[0])
-        .attr("cy", m[1])
-        .attr("r", bubbleR);
+    cursorElement.attr("r", bubbleR);
 
     return nearest;
   }
 
   if (type === "AREA") {
-    cursorElement
-        .attr("cx", m[0])
-        .attr("cy", m[1])
-        .attr("r", AREA_CURSOR_RADIUS);
+    cursorElement.attr("r", AREA_CURSOR_RADIUS);
 
     let insideIdx = -1, overlapCount = 0, lastOverlap = -1;
     for (let i = 0; i < targets.length; i++) {
@@ -173,23 +167,20 @@ function setupSVG(cond) {
   const mount = document.getElementById("svgMount");
   mount.innerHTML = "";
 
-  // Toggle the system cursor:
-  // If it's POINT, use 'default'. Otherwise, hide it ('none').
-  const cursorStyle = (cond.cursor === "POINT") ? "default" : "none";
-
+  // Always show the system cursor now
   svg = d3.select("#svgMount").append("svg")
       .attr("width", W)
       .attr("height", H)
-      .style("cursor", cursorStyle);
+      .style("cursor", "default");
 
   svg.append("rect")
       .attr("width", W)
       .attr("height", H)
       .attr("fill", "#fafafa");
 
-  // The range indicator circle (only visible for BUBBLE and AREA)
+  // Range indicator circle
   svg.append("circle").attr("class", "cursorVis")
-      .attr("fill", "rgba(128, 128, 128, 0.2)")
+      .attr("fill", "rgba(128, 128, 128, 0.15)") // Slightly lighter to see pointer better
       .attr("stroke", "#999")
       .attr("pointer-events", "none");
 
