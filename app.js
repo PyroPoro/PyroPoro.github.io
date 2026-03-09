@@ -56,10 +56,7 @@ function showInstructionScreen() {
   const cond = conditions[condIdx];
   document.getElementById("instrParticipant").textContent = `Participant: ${participant}`;
   document.getElementById("condNum").textContent = condIdx + 1;
-
-  // Updated Block Counter Logic
   document.getElementById("instrBlockNum").textContent = blockIdx + 1;
-
   document.getElementById("instrCursor").textContent = cond.cursor;
   document.getElementById("instrSize").textContent = cond.size.label;
   document.getElementById("instrSep").textContent = cond.sep.label;
@@ -170,32 +167,36 @@ function setupSVG(cond) {
   const mount = document.getElementById("svgMount");
   mount.innerHTML = "";
 
-  // Force 'default' cursor on the SVG container
+  // Create the SVG
   svg = d3.select("#svgMount").append("svg")
       .attr("width", W)
-      .attr("height", H)
-      .style("cursor", "default");
+      .attr("height", H);
 
-  // Ensure the background rectangle also forces the default cursor
+  // Background rect - ensure it doesn't have a 'none' cursor
   svg.append("rect")
       .attr("width", W)
       .attr("height", H)
       .attr("fill", "#fafafa")
       .style("cursor", "default");
 
-  // Range indicator circle
+  // Range indicator circle (The gray circle)
+  // IMPORTANT: pointer-events is 'none' so it doesn't steal the mouse focus
   svg.append("circle")
       .attr("class", "cursorVis")
       .attr("fill", "rgba(128, 128, 128, 0.15)")
       .attr("stroke", "#999")
-      .attr("pointer-events", "none"); // Crucial: cursor "shines through" this element
+      .attr("stroke-width", 1)
+      .attr("pointer-events", "none");
 
+  // Attach listeners to the SVG itself
   svg.on("mousemove", function() {
     const mouse = d3.mouse(this);
     const captured = getCapture(mouse, cond.cursor);
     updateFill(captured);
   }).on("click", function() {
-    handleClick(getCapture(d3.mouse(this), cond.cursor));
+    const mouse = d3.mouse(this);
+    const captured = getCapture(mouse, cond.cursor);
+    handleClick(captured);
   });
 }
 
@@ -226,14 +227,11 @@ function finishBlock() {
   document.getElementById("breakAccuracy").textContent = acc + "%";
   document.getElementById("breakAvgTime").textContent = avgTime + " ms";
 
-  blockIdx++; // Move to next block state
-
+  blockIdx++;
   if (blockIdx >= BLOCKS_PER_CONDITION) {
-    document.getElementById("breakHeader").textContent = "Condition Complete!";
     document.getElementById("breakBtn").textContent = "Next Condition →";
   } else {
-    document.getElementById("breakHeader").textContent = "Block Complete";
-    document.getElementById("breakBtn").textContent = "Continue to Next Block →";
+    document.getElementById("breakBtn").textContent = "Next Block →";
   }
   showScreen("breakScreen");
 }
