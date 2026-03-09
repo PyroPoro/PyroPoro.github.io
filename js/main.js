@@ -1,7 +1,7 @@
 ﻿import {createSVG,drawTargets} from "./ui.js";
 import {Experiment} from "./experiment.js";
 
-const participant = prompt("Enter participant number:");
+const participant=prompt("Enter participant number:");
 
 const svg=createSVG();
 
@@ -15,7 +15,7 @@ function showInstruction(){
 
     panel.innerHTML=`
 
-<h2>Target Selection Study</h2>
+<h2>Cursor Selection Experiment</h2>
 
 <p><b>Participant:</b> ${participant}</p>
 
@@ -30,6 +30,20 @@ function showInstruction(){
 `;
 
     document.getElementById("startBtn").onclick=startBlock;
+
+}
+
+function showBreak(){
+
+    panel.innerHTML=`
+
+<h3>Block Complete</h3>
+
+<button id="nextBlock">Next Block</button>
+
+`;
+
+    document.getElementById("nextBlock").onclick=startBlock;
 
 }
 

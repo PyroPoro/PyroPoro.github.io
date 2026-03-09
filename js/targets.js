@@ -24,13 +24,9 @@ export function initTargets(numTargets,minRadius,maxRadius,minSep){
 
         for(let t of targets){
 
-            const sep=distance(pt,t[0]);
-
-            if(sep < rad + t[1] + minSep){
-
+            if(distance(pt,t[0])<rad+t[1]+minSep){
                 collision=true;
                 break;
-
             }
 
         }

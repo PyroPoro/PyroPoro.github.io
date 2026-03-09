@@ -6,9 +6,7 @@ export function pointCursor(mouse,targets){
 
     targets.forEach((t,i)=>{
 
-        const d=distance(mouse,t[0]);
-
-        if(d <= t[1]) idx=i;
+        if(distance(mouse,t[0])<=t[1]) idx=i;
 
     });
 
@@ -22,9 +20,7 @@ export function areaCursor(mouse,targets,radius){
 
     targets.forEach((t,i)=>{
 
-        const d=distance(mouse,t[0]);
-
-        if(d <= t[1]+radius) idx=i;
+        if(distance(mouse,t[0])<=t[1]+radius) idx=i;
 
     });
 
@@ -34,22 +30,29 @@ export function areaCursor(mouse,targets,radius){
 
 export function bubbleCursor(mouse,targets){
 
-    let best=0;
-    let min=Infinity;
+    let minIndex=0;
+
+    let minDist=Infinity;
+    let secondDist=Infinity;
 
     targets.forEach((t,i)=>{
 
-        const d=distance(mouse,t[0]) - t[1];
+        const d=distance(mouse,t[0]);
 
-        if(d<min){
+        if(d<minDist){
 
-            min=d;
-            best=i;
+            secondDist=minDist;
+            minDist=d;
+            minIndex=i;
+
+        }else if(d<secondDist){
+
+            secondDist=d;
 
         }
 
     });
 
-    return best;
+    return {index:minIndex,dist:minDist,second:secondDist};
 
 }

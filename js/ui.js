@@ -13,6 +13,14 @@ export function createSVG(){
         .attr("fill","white")
         .attr("stroke","black");
 
+    svg.append("circle")
+        .attr("class","cursorCircle")
+        .attr("cx",0)
+        .attr("cy",0)
+        .attr("r",0)
+        .attr("fill","lightgray")
+        .attr("opacity",0.5);
+
     return svg;
 
 }
@@ -45,5 +53,12 @@ export function updateTargets(svg,captured,target){
             return "white";
 
         });
+
+}
+
+export function updateTrialCounter(trial,total){
+
+    document.getElementById("trialCounter").innerText=
+        `Trial ${trial}/${total}`;
 
 }

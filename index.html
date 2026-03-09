@@ -1,30 +1,40 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
 
     <meta charset="utf-8">
-    <title>Cursor Selection Experiment</title>
+    <title>Cursor Experiment</title>
 
-    <script src="http://d3js.org/d3.v3.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
 
-        body {
-            font-family: Arial;
+        body{
+            font-family:Arial;
         }
 
-        #instructionPanel {
-            margin-bottom:20px;
+        #instructionPanel{
+            margin-bottom:15px;
         }
 
-        #experimentPanel {
+        #experimentPanel{
             width:960px;
+            position:relative;
         }
 
-        button {
+        #trialCounter{
+            position:absolute;
+            right:10px;
+            top:5px;
+            font-weight:bold;
+        }
+
+        button{
             padding:10px 20px;
             font-size:16px;
+            margin-top:10px;
         }
 
     </style>
@@ -34,7 +44,10 @@
 <body>
 
 <div id="instructionPanel"></div>
-<div id="experimentPanel"></div>
+
+<div id="experimentPanel">
+    <div id="trialCounter"></div>
+</div>
 
 <script type="module" src="./js/main.js"></script>
 

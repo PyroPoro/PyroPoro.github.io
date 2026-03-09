@@ -5,14 +5,14 @@ export function generateConditions(){
 
     let conditions=[];
 
-    config.cursorTypes.forEach(cursor=>{
+    config.cursorTypes.forEach(c=>{
 
         config.targetSizes.forEach(size=>{
 
             config.separations.forEach(sep=>{
 
                 conditions.push({
-                    cursorType:cursor,
+                    cursorType:c,
                     size:size,
                     separation:sep
                 });

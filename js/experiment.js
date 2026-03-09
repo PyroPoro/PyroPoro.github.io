@@ -2,7 +2,8 @@
 import {generateConditions} from "./conditions.js";
 import {initTargets} from "./targets.js";
 import {pointCursor,areaCursor,bubbleCursor} from "./cursors.js";
-import {updateTargets} from "./ui.js";
+import {updateTargets,updateTrialCounter} from "./ui.js";
+import {distance} from "./utils.js";
 
 export class Experiment{
 
@@ -15,7 +16,7 @@ export class Experiment{
 
         this.conditionIndex=0;
         this.block=1;
-        this.trial=0;
+        this.trial=1;
 
         this.trialTimes=[];
         this.missed=0;
@@ -26,9 +27,7 @@ export class Experiment{
     }
 
     currentCondition(){
-
         return this.conditions[this.conditionIndex];
-
     }
 
     setupTargets(){
@@ -42,7 +41,25 @@ export class Experiment{
             c.separation.value
         );
 
-        this.clickTarget=Math.floor(Math.random()*this.targets.length);
+        this.chooseNewTarget(true);
+
+        updateTrialCounter(this.trial,config.trialsPerBlock);
+
+    }
+
+    chooseNewTarget(first=false){
+
+        let newTarget=this.clickTarget;
+
+        while(newTarget===this.clickTarget){
+
+            newTarget=Math.floor(Math.random()*this.targets.length);
+
+            if(first) break;
+
+        }
+
+        this.clickTarget=newTarget;
 
     }
 
@@ -52,14 +69,43 @@ export class Experiment{
 
         let captured=-1;
 
-        if(c.cursorType==="POINT")
+        const cursor=this.svg.select(".cursorCircle");
+
+        if(c.cursorType==="POINT"){
+
             captured=pointCursor(mouse,this.targets);
+            cursor.attr("r",0);
 
-        if(c.cursorType==="AREA")
-            captured=areaCursor(mouse,this.targets,40);
+        }
 
-        if(c.cursorType==="BUBBLE")
-            captured=bubbleCursor(mouse,this.targets);
+        if(c.cursorType==="AREA"){
+
+            captured=areaCursor(mouse,this.targets,config.areaRadius);
+
+            cursor
+                .attr("cx",mouse[0])
+                .attr("cy",mouse[1])
+                .attr("r",config.areaRadius);
+
+        }
+
+        if(c.cursorType==="BUBBLE"){
+
+            const result=bubbleCursor(mouse,this.targets);
+
+            captured=result.index;
+
+            let radius=Math.min(
+                result.dist,
+                result.second
+            );
+
+            cursor
+                .attr("cx",mouse[0])
+                .attr("cy",mouse[1])
+                .attr("r",radius);
+
+        }
 
         updateTargets(this.svg,captured,this.clickTarget);
 
@@ -92,14 +138,16 @@ export class Experiment{
 
         this.trial++;
 
-        if(this.trial>=config.trialsPerBlock){
+        if(this.trial>config.trialsPerBlock){
 
             this.nextBlock();
             return;
 
         }
 
-        this.clickTarget=Math.floor(Math.random()*this.targets.length);
+        this.chooseNewTarget();
+
+        updateTrialCounter(this.trial,config.trialsPerBlock);
 
         this.startTime=performance.now();
 
@@ -116,7 +164,7 @@ export class Experiment{
 
         }
 
-        this.trial=0;
+        this.trial=1;
 
     }
 
@@ -129,14 +177,12 @@ export class Experiment{
         const c=this.currentCondition();
 
         this.results.push({
-
             cursor:c.cursorType,
             size:c.size.name,
             sep:c.separation.name,
             accuracy:accuracy,
             avg:avg,
             trials:[...this.trialTimes]
-
         });
 
     }
