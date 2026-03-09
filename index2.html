@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cursor HCI Experiment</title>
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .screen { display: none; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 1000px; }
+        .active { display: block; }
+        #experimentPanel { width: 960px; height: 500px; position: relative; border: 2px solid #333; margin-top: 20px; overflow: hidden; }
+        #trialCounter { position: absolute; right: 15px; top: 10px; font-weight: bold; background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 4px; }
+        .stats-box { background: #eef2ff; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .btn-primary { background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .btn-primary:hover { background: #1d4ed8; }
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 10px 20px; border-radius: 5px; opacity: 0; transition: opacity 0.3s; }
+        #toast.show { opacity: 1; }
+        .progress-bar { height: 10px; background: #e2e8f0; border-radius: 5px; margin-top: 10px; }
+        #overallProgress { height: 100%; background: #10b981; width: 0%; border-radius: 5px; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+
+<div id="setupScreen" class="screen active">
+    <h2>HCI Cursor Experiment</h2>
+    <p>Enter participant number to begin:</p>
+    <input type="number" id="participantInput" placeholder="e.g. 1" min="1" style="padding: 10px; font-size: 16px;">
+    <button class="btn-primary" onclick="startSetup()">Start Experiment</button>
+</div>
+
+<div id="instructionScreen" class="screen">
+    <h2 id="instrParticipant"></h2>
+    <div class="stats-box">
+        <h3>Condition <span id="condNum"></span> of 27</h3>
+        <p><strong>Cursor:</strong> <span id="instrCursor"></span></p>
+        <p><strong>Target Size:</strong> <span id="instrSize"></span></p>
+        <p><strong>Separation:</strong> <span id="instrSep"></span></p>
+    </div>
+    <p id="instrDesc"></p>
+    <p>You will perform <strong>3 blocks</strong> for this condition, with <strong>5 trials</strong> each.</p>
+    <div class="progress-bar"><div id="overallProgress"></div></div>
+    <button class="btn-primary" id="startBlockBtn" onclick="startBlock()">Start Block <span id="instrBlockNum">1</span></button>
+</div>
+
+<div id="experimentScreen" class="screen">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span id="metaHeader">Condition: <span id="metaCond"></span> | Block: <span id="metaBlock"></span> | Cursor: <span id="metaCursor"></span></span>
+    </div>
+    <div id="experimentPanel">
+        <div id="trialCounter"></div>
+        <div id="svgMount"></div>
+    </div>
+</div>
+
+<div id="breakScreen" class="screen">
+    <h2>Block Complete!</h2>
+    <div class="stats-box">
+        <p><strong>Accuracy:</strong> <span id="breakAccuracy"></span></p>
+        <p><strong>Avg Time:</strong> <span id="breakAvgTime"></span></p>
+    </div>
+    <button class="btn-primary" id="breakBtn" onclick="onBreakContinue()">Next</button>
+</div>
+
+<div id="completeScreen" class="screen">
+    <h2>Experiment Finished</h2>
+    <p>Thank you for your participation. You can now download your results.</p>
+    <button class="btn-primary" onclick="downloadData()">Download Data (.txt)</button>
+</div>
+
+<div id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
