@@ -233,22 +233,26 @@ function finishBlock() {
   } else {
     document.getElementById("breakBtn").textContent = "Next Block →";
   }
+
   showScreen("breakScreen");
 }
 
 function onBreakContinue() {
   if (blockIdx >= BLOCKS_PER_CONDITION) {
-    // Condition finished
+    // Condition finished - let's aggregate all 3 blocks
     const totalTrials = conditionData.flatMap(d => d.trials);
-    const condAvgTime = Math.round(totalTrials.reduce((a, b) => a + b.time, 0) / totalTrials.length);
     const totalMisses = totalTrials.reduce((a, b) => a + b.misses, 0);
-    const condAcc = ((totalTrials.length / (totalTrials.length + totalMisses)) * 100).toFixed(1);
+    const totalHits = totalTrials.length; // Each entry in totalTrials is a success
+
+    const cond = conditions[condIdx];
 
     allData.push({
-      cond: conditions[condIdx],
-      avgTime: condAvgTime,
-      accuracy: condAcc,
-      blocks: JSON.parse(JSON.stringify(conditionData))
+      cursor: cond.cursor,
+      sizeLabel: cond.size.label, // Explicitly store the label for JASP
+      sepLabel: cond.sep.label,   // Explicitly store the label for JASP
+      trials: totalTrials,
+      hits: totalHits,
+      misses: totalMisses
     });
 
     conditionData = [];
@@ -263,21 +267,55 @@ function onBreakContinue() {
 }
 
 function downloadData() {
-  let csv = `Participant: ${participant}\n\n`;
-  csv += `Condition,Cursor,Size,Separation,AvgTime_ms,Accuracy_pct\n`;
+  const cursors = ["POINT", "BUBBLE", "AREA"];
+  const sizes = ["Small", "Medium", "Large"];
+  const seps = ["Tight", "Normal", "Spread"];
 
-  allData.forEach((d, i) => {
-    csv += `${i+1},${d.cond.cursor},${d.cond.size.label},${d.cond.sep.label},${d.avgTime},${d.accuracy}\n`;
-    d.blocks.forEach((b, bi) => {
-      b.trials.forEach((t, ti) => {
-        csv += `TrialDetails,Block ${bi+1},Trial ${ti+1},Time: ${t.time}ms,Misses: ${t.misses}\n`;
+  let csv = "ParticipantID";
+  let conditionCols = [];
+
+  // 1. Create Headers
+  cursors.forEach(c => {
+    sizes.forEach(sz => {
+      seps.forEach(sp => {
+        const base = `${c}_${sz}_${sp}`;
+        conditionCols.push({cursor: c, size: sz, sep: sp});
+        csv += `,${base}_Time,${base}_Acc`;
       });
     });
-    csv += `\n`;
+  });
+  csv += "\n";
+
+  // 2. Add Data Row
+  csv += participant;
+
+  conditionCols.forEach(col => {
+    // Look in 'allData' (the state variable) for a match
+    const match = allData.find(r =>
+        r.cursor === col.cursor &&
+        r.sizeLabel === col.size &&
+        r.sepLabel === col.sep
+    );
+
+    if (match && match.trials.length > 0) {
+      const avgTime = Math.round(match.trials.reduce((a, b) => a + b.time, 0) / match.trials.length);
+      const accuracy = ((match.hits / (match.hits + match.misses)) * 100).toFixed(1);
+      csv += `,${avgTime},${accuracy}`;
+    } else {
+      csv += ",N/A,N/A";
+    }
   });
 
-  const blob = new Blob([csv], { type: "text/plain;charset=utf-8" });
-  saveAs(blob, `P${participant}_Results.txt`);
+  // 3. Trigger Download
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = `P${participant}_RM_ANOVA.csv`;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
